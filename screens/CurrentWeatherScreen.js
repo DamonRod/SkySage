@@ -1,67 +1,122 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Button, ActivityIndicator } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, Modal, Pressable } from 'react-native';
+import { connect } from 'react-redux';
+import { addLocation, removeLocation, clearAllLocations, updateLocationName } from '../redux/actions';
 
-const WeatherScreen = () => {
-  const [city, setCity] = useState('');
-  const [weatherData, setWeatherData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, clearAllLocations, updateLocationName, navigation }) => {
+  const [locationName, setLocationName] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
-  const handleGetWeather = async () => {
-    try {
-      setLoading(true);
-      const apiKey = '786e6b9533e1aafe1251e09e9c57856d';
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}`
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setWeatherData(data);
-        setError(null);
-      } else {
-        setError('Error fetching weather data');
-      }
-    } catch (error) {
-      setError('Error fetching weather data');
-    } finally {
-      setLoading(false);
+  const handleSaveLocation = () => {
+    if (locationName.trim() !== '') {
+      addLocation(locationName);
+      setLocationName('');
     }
   };
 
-  const convertKelvinToCelsius = (kelvin) => {
-    return (kelvin - 273.15).toFixed(2);
+  const handleRemoveLocation = (location) => {
+    removeLocation(location);
+  };
+  
+  const handleEditLocation = (location) => {
+    setSelectedLocation(location);
+    setModalVisible(true);
+    setLocationName(location); // Set the location name in the modal input to the current name
   };
 
-  const convertKelvinToFahrenheit = (kelvin) => {
-    return (((kelvin - 273.15) * 9) / 5 + 32).toFixed(2);
+  const handleUpdateLocationName = () => {
+    if (selectedLocation && locationName.trim() !== '') {
+      updateLocationName(selectedLocation, locationName);
+      setModalVisible(false);
+      setSelectedLocation(null);
+      setLocationName('');
+    }
+  };
+
+  const handleClearAllLocations = () => {
+    clearAllLocations();
+  };
+
+  const handleLocationPress = (location) => {
+    setSelectedLocation(location);
+    setModalVisible(true);
+    // Set the location name in the modal input to the current name
+    setLocationName(location);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedLocation(null);
+    setLocationName('');
   };
 
   return (
     <View>
-      <Text>Curent Weather Information</Text>
+      <Text>Saved Locations</Text>
       <TextInput
-        placeholder="Enter City"
-        value={city}
-        onChangeText={(text) => setCity(text)}
+        placeholder="Enter Location Name"
+        value={locationName}
+        onChangeText={(text) => setLocationName(text)}
       />
-      <Button title="Get Weather" color="#78e1e9" onPress={handleGetWeather} />
-      {error && <Text style={{ color: 'red' }}>{error}</Text>}
-      {loading && <ActivityIndicator size="large" color="#e4d155" />}
+      <Button title="Save Location" onPress={handleSaveLocation} />
 
-      {weatherData && (
-        <View>
-          <Text>{`City: ${weatherData.name}`}</Text>
-          <Text>{`Temperature: ${convertKelvinToCelsius(
-            weatherData.main.temp
-          )} °C, ${convertKelvinToFahrenheit(weatherData.main.temp)} °F`}</Text>
-          <Text>{`Humidity: ${weatherData.main.humidity}%`}</Text>
-          <Text>{`Pressure: ${weatherData.main.pressure} hPa`}</Text>
-          <Text>{`Description: ${weatherData.weather[0].description}`}</Text>
-        </View>
+      {/* Render saved locations */}
+      <FlatList
+        data={savedLocations}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          item && (
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Button title={item.name} onPress={() => handleLocationPress(item.name)} />
+              <Button title="Edit" onPress={() => handleEditLocation(item.name)} /> {/* Add this line */}
+              <Button title="Remove" onPress={() => handleRemoveLocation(item.name)} />
+            </View>
+          )
+        )}
+      />
+
+      {savedLocations.length > 0 && (
+        <Button title="Clear All Locations" onPress={handleClearAllLocations} />
       )}
+
+      {/* Modal for updating location name */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, elevation: 5 }}>
+            <Text>Edit Location Name</Text>
+            <TextInput
+              placeholder="Enter New Name"
+              value={locationName}
+              onChangeText={(text) => setLocationName(text)}
+            />
+            <Pressable onPress={handleUpdateLocationName}>
+              <Text>Update</Text>
+            </Pressable>
+            <Pressable onPress={closeModal}>
+              <Text>Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
-export default WeatherScreen;
+const mapStateToProps = (state) => ({
+  savedLocations: state.savedLocations,
+});
+
+const mapDispatchToProps = {
+  addLocation,
+  removeLocation,
+  clearAllLocations,
+  updateLocationName,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SavedLocationsScreen);

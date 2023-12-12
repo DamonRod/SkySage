@@ -5,6 +5,7 @@ const HomeScreen = ({ navigation }) => {
   const fadein = useRef(new Animated.Value(0)).current;
   const buttonFade = useRef(new Animated.Value(0)).current;
   const buttonFade2 = useRef(new Animated.Value(0)).current;
+  const buttonFade3 = useRef(new Animated.Value(0)).current;
 
   const startAnimation = () => {
     Animated.timing(fadein, {
@@ -100,9 +101,9 @@ const HomeScreen = ({ navigation }) => {
           ],
         }}>
         <Button
-          title="Favorites"
+          title="Saved Locations"
           color="#78e1e9"
-          onPress={() => navigation.navigate('')}
+          onPress={() => navigation.navigate('Saved Locations')}
         />
       </Animated.View>      
     </View>
