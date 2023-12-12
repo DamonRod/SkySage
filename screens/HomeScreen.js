@@ -26,6 +26,13 @@ const HomeScreen = ({ navigation }) => {
       delay: 600,
       useNativeDriver: true,
     }).start();
+
+    Animated.timing(buttonFade3, {
+      toValue: 1,
+      duration: 1400,
+      delay: 700,
+      useNativeDriver: true,
+    }).start();
   };
 
   useEffect(() => {
@@ -80,6 +87,24 @@ const HomeScreen = ({ navigation }) => {
           onPress={() => navigation.navigate('Weather Forecast')}
         />
       </Animated.View>
+      <Animated.View
+        style={{
+          opacity: buttonFade3,
+          transform: [
+            {
+              translateY: buttonFade3.interpolate({
+                inputRange: [0, 1],
+                outputRange: [50, 0],
+              }),
+            },
+          ],
+        }}>
+        <Button
+          title="Favorites"
+          color="#78e1e9"
+          onPress={() => navigation.navigate('')}
+        />
+      </Animated.View>      
     </View>
   );
 };
