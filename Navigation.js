@@ -7,6 +7,7 @@ import HomeScreen from './screens/HomeScreen';
 import WeatherScreen from './screens/CurrentWeatherScreen';
 import ForecastScreen from './screens/ForecastScreen';
 import SavedLocationsScreen from './screens/SavedLocationsScreen';
+import AboutScreen from './screens/AboutScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +20,7 @@ const Navigation = () => {
           <Tab.Screen name="Current Weather" component={WeatherScreen} />
           <Tab.Screen name="Weather Forecast" component={ForecastScreen} />
           <Tab.Screen name="Saved Locations" component={SavedLocationsScreen} />
+          <Tab.Screen name="About" component={AboutScreen} />
         </Tab.Navigator>
       </NavigationContainer>
     </Provider>
