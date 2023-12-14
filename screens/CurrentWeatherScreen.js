@@ -1,122 +1,81 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, Modal, Pressable } from 'react-native';
-import { connect } from 'react-redux';
-import { addLocation, removeLocation, clearAllLocations, updateLocationName } from '../redux/actions';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, ScrollView, ActivityIndicator } from 'react-native';
+import { globalStyles, colors } from './styles';
 
-const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, clearAllLocations, updateLocationName, navigation }) => {
-  const [locationName, setLocationName] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState(null);
+const CurrentWeatherScreen = ({ route }) => {
+  const [city, setCity] = useState(route.params?.city || '');
+  const [currentWeather, setCurrentWeather] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSaveLocation = () => {
-    if (locationName.trim() !== '') {
-      addLocation(locationName);
-      setLocationName('');
+  useEffect(() => {
+    if (route.params?.clearForm) {
+      setCity(route.params?.city || '');
+    }
+  }, [route.params?.clearForm, route.params?.city]);
+
+  const handleGetCurrentWeather = async () => {
+    try {
+      setLoading(true);
+      const openWeatherMapApiKey = '786e6b9533e1aafe1251e09e9c57856d';
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${openWeatherMapApiKey}`
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentWeather(data);
+        setError(null);
+      } else {
+        setError('Error fetching current weather data');
+      }
+    } catch (error) {
+      setError('Error fetching current weather data');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRemoveLocation = (location) => {
-    removeLocation(location);
-  };
-  
-  const handleEditLocation = (location) => {
-    setSelectedLocation(location);
-    setModalVisible(true);
-    setLocationName(location); // Set the location name in the modal input to the current name
+  const convertKelvinToCelsius = (kelvin) => {
+    return (kelvin - 273.15).toFixed(2);
   };
 
-  const handleUpdateLocationName = () => {
-    if (selectedLocation && locationName.trim() !== '') {
-      updateLocationName(selectedLocation, locationName);
-      setModalVisible(false);
-      setSelectedLocation(null);
-      setLocationName('');
-    }
-  };
-
-  const handleClearAllLocations = () => {
-    clearAllLocations();
-  };
-
-  const handleLocationPress = (location) => {
-    setSelectedLocation(location);
-    setModalVisible(true);
-    // Set the location name in the modal input to the current name
-    setLocationName(location);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-    setSelectedLocation(null);
-    setLocationName('');
+  const convertKelvinToFahrenheit = (kelvin) => {
+    return (((kelvin - 273.15) * 9) / 5 + 32).toFixed(2);
   };
 
   return (
-    <View>
-      <Text>Saved Locations</Text>
-      <TextInput
-        placeholder="Enter Location Name"
-        value={locationName}
-        onChangeText={(text) => setLocationName(text)}
-      />
-      <Button title="Save Location" onPress={handleSaveLocation} />
-
-      {/* Render saved locations */}
-      <FlatList
-        data={savedLocations}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          item && (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Button title={item.name} onPress={() => handleLocationPress(item.name)} />
-              <Button title="Edit" onPress={() => handleEditLocation(item.name)} /> {/* Add this line */}
-              <Button title="Remove" onPress={() => handleRemoveLocation(item.name)} />
-            </View>
-          )
-        )}
-      />
-
-      {savedLocations.length > 0 && (
-        <Button title="Clear All Locations" onPress={handleClearAllLocations} />
-      )}
-
-      {/* Modal for updating location name */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeModal}
-      >
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, elevation: 5 }}>
-            <Text>Edit Location Name</Text>
-            <TextInput
-              placeholder="Enter New Name"
-              value={locationName}
-              onChangeText={(text) => setLocationName(text)}
-            />
-            <Pressable onPress={handleUpdateLocationName}>
-              <Text>Update</Text>
-            </Pressable>
-            <Pressable onPress={closeModal}>
-              <Text>Cancel</Text>
-            </Pressable>
+    <ScrollView style={globalStyles.container}>
+      <View>
+        <Text style={globalStyles.title}>Current Weather</Text>
+        <TextInput
+          style={globalStyles.input}
+          placeholder="Enter City"
+          value={city}
+          onChangeText={(text) => setCity(text)}
+        />
+        <Button
+          style={globalStyles.button}
+          title="Get Current Weather"
+          color={colors.primary}
+          onPress={handleGetCurrentWeather}
+        />
+        {loading && <ActivityIndicator size="large" color={colors.secondary} />}
+        {error && <Text style={globalStyles.errorText}>{error}</Text>}
+        {currentWeather && <Text style={globalStyles.title}>City: {currentWeather.name}</Text>}
+        {currentWeather && (
+          <View>
+            <Text>{`Temperature: ${convertKelvinToCelsius(
+              currentWeather.main.temp
+            )} °C, ${convertKelvinToFahrenheit(currentWeather.main.temp)} °F`}</Text>
+            <Text>{`Humidity: ${currentWeather.main.humidity}%`}</Text>
+            <Text>{`Pressure: ${currentWeather.main.pressure} hPa`}</Text>
+            <Text>{`Description: ${currentWeather.weather[0].description}`}</Text>
           </View>
-        </View>
-      </Modal>
-    </View>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
-const mapStateToProps = (state) => ({
-  savedLocations: state.savedLocations,
-});
-
-const mapDispatchToProps = {
-  addLocation,
-  removeLocation,
-  clearAllLocations,
-  updateLocationName,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(SavedLocationsScreen);
+export default CurrentWeatherScreen;

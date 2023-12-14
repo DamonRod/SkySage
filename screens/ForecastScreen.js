@@ -1,13 +1,6 @@
-import { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  FlatList,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, ActivityIndicator } from 'react-native';
+import { globalStyles, colors } from './styles';
 
 const ForecastScreen = ({ route }) => {
   const [city, setCity] = useState(route.params?.city || '');
@@ -46,8 +39,7 @@ const ForecastScreen = ({ route }) => {
   };
 
   const renderForecastItem = ({ item }) => (
-    <View>
-      <Text>----------------------</Text>
+    <View style={[globalStyles.forecastItem, { backgroundColor: 'white' }]}>
       <Text>{`Date/Time: ${item.dt_txt}`}</Text>
       <Text>{`Temperature: ${convertKelvinToCelsius(
         item.main.temp
@@ -59,31 +51,31 @@ const ForecastScreen = ({ route }) => {
   );
 
   return (
-    <ScrollView>
-      <View>
-        <Text>7-Day Forecast</Text>
-        <TextInput
-          placeholder="Enter City"
-          value={city}
-          onChangeText={(text) => setCity(text)}
+    <View style={globalStyles.container}>
+      <Text style={globalStyles.title}>7-Day Forecast</Text>
+      <TextInput
+        style={globalStyles.input}
+        placeholder="Enter City"
+        value={city}
+        onChangeText={(text) => setCity(text)}
+      />
+      <Button
+        style={globalStyles.button}
+        title="Get Forecast"
+        color={colors.primary}
+        onPress={handleGetForecast}
+      />
+      {loading && <ActivityIndicator size="large" color={colors.secondary} />}
+      {error && <Text style={globalStyles.errorText}>{error}</Text>}
+      {forecastData && <Text style={globalStyles.title}>City: {city}</Text>}
+      {forecastData && (
+        <FlatList
+          data={forecastData}
+          keyExtractor={(item) => item.dt.toString()}
+          renderItem={renderForecastItem}
         />
-        <Button
-          title="Get Forecast"
-          color="#78e1e9"
-          onPress={handleGetForecast}
-        />
-        {loading && <ActivityIndicator size="large" color="#e4d155" />}
-        {error && <Text style={{ color: 'red' }}>{error}</Text>}
-        {forecastData && <Text style={{}}>City: {city}</Text>}
-        {forecastData && (
-          <FlatList
-            data={forecastData}
-            keyExtractor={(item) => item.dt.toString()}
-            renderItem={renderForecastItem}
-          />
-        )}
-      </View>
-    </ScrollView>
+      )}
+    </View>
   );
 };
 
