@@ -7,6 +7,7 @@ import { globalStyles, colors } from './styles';
 const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, clearAllLocations, navigation }) => {
   const [locationName, setLocationName] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
 
   const handleSaveLocation = () => {
     if (locationName.trim() !== '') {
@@ -20,24 +21,37 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
   };
 
   const handleClearAllLocations = () => {
-    Alert.alert(
-      'Clear All Locations',
-      'Are you sure you want to remove all saved locations?',
-      [
-        {
-          text: 'No',
-          style: 'cancel',
-        },
-        {
-          text: 'Yes',
-          onPress: () => {
-            clearAllLocations();
-          },
-        },
-      ],
-      { cancelable: true }
-    );
+    setConfirmationModalVisible(true);
   };
+
+  const handleConfirmClearAllLocations = () => {
+    clearAllLocations();
+    setConfirmationModalVisible(false);
+  };
+
+  const handleCancelClearAllLocations = () => {
+    setConfirmationModalVisible(false);
+  };
+
+  // const handleClearAllLocations = () => {
+  //   Alert.alert(
+  //     'Clear All Locations',
+  //     'Are you sure you want to remove all saved locations?',
+  //     [
+  //       {
+  //         text: 'No',
+  //         style: 'cancel',
+  //       },
+  //       {
+  //         text: 'Yes',
+  //         onPress: () => {
+  //           clearAllLocations();
+  //         },
+  //       },
+  //     ],
+  //     { cancelable: true }
+  //   );
+  // };
   
 
   const handleLocationPress = (location) => {
@@ -77,6 +91,24 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
       {savedLocations.length > 0 && (
         <Button style={globalStyles.button} title="Clear All Locations" onPress={handleClearAllLocations} />
       )}
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={confirmationModalVisible}
+        onRequestClose={() => setConfirmationModalVisible(false)}
+      >
+        <View style={globalStyles.centeredModal}>
+          <View style={globalStyles.modalContent}>
+            <Text style={globalStyles.modalText}>Are you sure you want to clear all locations?</Text>
+            <View style={globalStyles.modalButtons}>
+              <Button title="Cancel" onPress={handleCancelClearAllLocations} />
+              <Button title="Confirm" onPress={handleConfirmClearAllLocations} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
     </View>
   );
 };

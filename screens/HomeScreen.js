@@ -1,15 +1,30 @@
 import { useRef, useEffect } from 'react';
-import { View, Text, Image, Button, Animated } from 'react-native';
+import { View, Text, Image, Button, Animated, TouchableOpacity } from 'react-native';
 
 const HomeScreen = ({ navigation }) => {
   const fadein = useRef(new Animated.Value(0)).current;
   const buttonFade = useRef(new Animated.Value(0)).current;
   const buttonFade2 = useRef(new Animated.Value(0)).current;
   const buttonFade3 = useRef(new Animated.Value(0)).current;
+  const buttonFade4 = useRef(new Animated.Value(0)).current;
+  const logoFall = useRef(new Animated.Value(-200)).current;
 
   const startAnimation = () => {
+    fadein.setValue(0);
+    logoFall.setValue(-200);
+    buttonFade.setValue(0);
+    buttonFade2.setValue(0);
+    buttonFade3.setValue(0);
+    buttonFade4.setValue(0);
+
     Animated.timing(fadein, {
       toValue: 1,
+      duration: 2000,
+      useNativeDriver: true,
+    }).start();
+
+    Animated.timing(logoFall, {
+      toValue: 0,
       duration: 2000,
       useNativeDriver: true,
     }).start();
@@ -34,24 +49,34 @@ const HomeScreen = ({ navigation }) => {
       delay: 700,
       useNativeDriver: true,
     }).start();
+
+    Animated.timing(buttonFade4, {
+      toValue: 1,
+      duration: 1600,
+      delay: 800,
+      useNativeDriver: true,
+    }).start();
   };
 
   useEffect(() => {
     startAnimation();
-  }, [fadein, buttonFade, buttonFade2]);
+  }, [fadein, logoFall, buttonFade, buttonFade2]);
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text style={{ fontSize: 20, fontWeight: 'bold' }}>SkySage</Text>
-      <Animated.Image
-        source={require('../assets/logo.png')}
-        style={{
-          width: 100,
-          height: 100,
-          marginVertical: 20,
-          opacity: fadein,
-        }}
-      />
+      <TouchableOpacity onPress={startAnimation}>
+        <Animated.Image
+          source={require('../assets/logo.png')}
+          style={{
+            width: 100,
+            height: 100,
+            marginVertical: 20,
+            opacity: fadein,
+            transform: [{ translateY: logoFall }],
+          }}
+        />
+      </TouchableOpacity>
       <Animated.View
         style={{
           opacity: buttonFade,
@@ -105,7 +130,26 @@ const HomeScreen = ({ navigation }) => {
           color="#78e1e9"
           onPress={() => navigation.navigate('Saved Locations')}
         />
-      </Animated.View>      
+      </Animated.View>
+      <Animated.View
+        style={{
+          opacity: buttonFade4,
+          transform: [
+            {
+              translateY: buttonFade4.interpolate({
+                inputRange: [0, 1],
+                outputRange: [50, 0],
+              }),
+            },
+          ],
+        }}>
+        <Button
+          title="About Page"
+          color="#78e1e9"
+          onPress={() => navigation.navigate('About')}
+        />
+      </Animated.View>
+
     </View>
   );
 };

@@ -9,6 +9,31 @@ export const colors = {
 };
 
 export const globalStyles = StyleSheet.create({
+  centeredModal: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // semi-transparent background
+  },
+
+  modalContent: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5, // shadow on Android
+  },
+
+  modalText: {
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+
+
   container: {
     flex: 1,
     backgroundColor: '#b1d697',
