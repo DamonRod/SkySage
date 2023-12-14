@@ -77,7 +77,7 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
         visible={confirmationModalVisible}
         onRequestClose={() => setConfirmationModalVisible(false)}
       >
-        <View style={globalStyles.modalContainer}>
+        <View style={globalStyles.centeredModal}>
           <View style={globalStyles.modalContent}>
             <Text style={globalStyles.modalText}>Are you sure you want to clear all locations?</Text>
             <View style={globalStyles.modalButtons}>
