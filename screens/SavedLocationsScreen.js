@@ -53,13 +53,14 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
         title="Save Location"
         onPress={handleSaveLocation}
       />
-
+      <View style={{ marginBottom: 10 }} />  
+      
       <FlatList
         data={savedLocations}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           item && (
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <Button title={item.name} onPress={() => handleLocationPress(item.name)} />
               <Button title="Remove" onPress={() => handleRemoveLocation(item.name)} />
             </View>
