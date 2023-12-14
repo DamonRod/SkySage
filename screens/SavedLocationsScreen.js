@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, Modal, Pressable } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, Modal, Pressable, Alert } from 'react-native';
 import { connect } from 'react-redux';
 import { addLocation, removeLocation, clearAllLocations } from '../redux/actions';
 import { globalStyles, colors } from './styles';
@@ -20,8 +20,25 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
   };
 
   const handleClearAllLocations = () => {
-    clearAllLocations();
+    Alert.alert(
+      'Clear All Locations',
+      'Are you sure you want to remove all saved locations?',
+      [
+        {
+          text: 'No',
+          style: 'cancel',
+        },
+        {
+          text: 'Yes',
+          onPress: () => {
+            clearAllLocations();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
+  
 
   const handleLocationPress = (location) => {
     setSelectedLocation(location);
