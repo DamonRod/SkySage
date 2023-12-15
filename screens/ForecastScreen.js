@@ -62,7 +62,6 @@ const ForecastScreen = ({ route }) => {
       <Button
         style={globalStyles.button}
         title="Get Forecast"
-        color={colors.primary}
         onPress={handleGetForecast}
       />
       {loading && <ActivityIndicator size="large" color={colors.secondary} />}

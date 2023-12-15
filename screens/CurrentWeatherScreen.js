@@ -57,7 +57,6 @@ const CurrentWeatherScreen = ({ route }) => {
         <Button
           style={globalStyles.button}
           title="Get Current Weather"
-          color={colors.primary}
           onPress={handleGetCurrentWeather}
         />
         {loading && <ActivityIndicator size="large" color={colors.secondary} />}
