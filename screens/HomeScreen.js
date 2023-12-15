@@ -91,7 +91,6 @@ const HomeScreen = ({ navigation }) => {
         }}>
         <Button
           title="Current Weather"
-          color="#78e1e9"
           onPress={() => navigation.navigate('Current Weather')}
         />
       </Animated.View>
@@ -109,7 +108,6 @@ const HomeScreen = ({ navigation }) => {
         }}>
         <Button
           title="Weather Forecast"
-          color="#78e1e9"
           onPress={() => navigation.navigate('Weather Forecast')}
         />
       </Animated.View>
@@ -127,7 +125,6 @@ const HomeScreen = ({ navigation }) => {
         }}>
         <Button
           title="Saved Locations"
-          color="#78e1e9"
           onPress={() => navigation.navigate('Saved Locations')}
         />
       </Animated.View>
@@ -145,7 +142,6 @@ const HomeScreen = ({ navigation }) => {
         }}>
         <Button
           title="About Page"
-          color="#78e1e9"
           onPress={() => navigation.navigate('About')}
         />
       </Animated.View>
