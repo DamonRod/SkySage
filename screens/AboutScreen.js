@@ -36,7 +36,7 @@ const AboutScreen = () => {
       {showEasterEgg && (
         <View>
           <Image
-            source={{ uri: 'https://c.tenor.com/bdXrzy-_-LMAAAAd/tenor.gif' }}
+
             style={{ marginTop: 10, width: 200, height: 200 }}
           />
         </View>

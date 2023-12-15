@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, Modal, Pressable, Alert } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, Modal } from 'react-native';
 import { connect } from 'react-redux';
 import { addLocation, removeLocation, clearAllLocations } from '../redux/actions';
-import { globalStyles, colors } from './styles';
+import { globalStyles } from './styles';
 
 const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, clearAllLocations, navigation }) => {
   const [locationName, setLocationName] = useState('');
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [confirmationModalVisible, setConfirmationModalVisible] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const handleSaveLocation = () => {
     if (locationName.trim() !== '') {
@@ -17,7 +18,19 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
   };
 
   const handleRemoveLocation = (location) => {
-    removeLocation(location);
+    setSelectedLocation(location);
+    setDeleteModalVisible(true);
+  };
+
+  const handleConfirmDeleteLocation = () => {
+    if (selectedLocation) {
+      removeLocation(selectedLocation);
+      setDeleteModalVisible(false);
+    }
+  };
+
+  const handleCancelDeleteLocation = () => {
+    setDeleteModalVisible(false);
   };
 
   const handleClearAllLocations = () => {
@@ -32,27 +45,6 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
   const handleCancelClearAllLocations = () => {
     setConfirmationModalVisible(false);
   };
-
-  // const handleClearAllLocations = () => {
-  //   Alert.alert(
-  //     'Clear All Locations',
-  //     'Are you sure you want to remove all saved locations?',
-  //     [
-  //       {
-  //         text: 'No',
-  //         style: 'cancel',
-  //       },
-  //       {
-  //         text: 'Yes',
-  //         onPress: () => {
-  //           clearAllLocations();
-  //         },
-  //       },
-  //     ],
-  //     { cancelable: true }
-  //   );
-  // };
-  
 
   const handleLocationPress = (location) => {
     setSelectedLocation(location);
@@ -74,8 +66,8 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
         title="Save Location"
         onPress={handleSaveLocation}
       />
-      <View style={{ marginBottom: 10 }} />  
-      
+      <View style={{ marginBottom: 10 }} />
+
       <FlatList
         data={savedLocations}
         keyExtractor={(item, index) => index.toString()}
@@ -105,6 +97,23 @@ const SavedLocationsScreen = ({ savedLocations, addLocation, removeLocation, cle
             <View style={globalStyles.modalButtons}>
               <Button title="Cancel" onPress={handleCancelClearAllLocations} />
               <Button title="Confirm" onPress={handleConfirmClearAllLocations} />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={deleteModalVisible}
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={globalStyles.centeredModal}>
+          <View style={globalStyles.modalContent}>
+            <Text style={globalStyles.modalText}>Are you sure you want to delete this location?</Text>
+            <View style={globalStyles.modalButtons}>
+              <Button title="Cancel" onPress={handleCancelDeleteLocation} />
+              <Button title="Delete" onPress={handleConfirmDeleteLocation} />
             </View>
           </View>
         </View>
